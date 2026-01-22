@@ -25,3 +25,9 @@ export type NewUser = typeof users.$inferInsert;
 export type Todo = typeof todos.$inferSelect;
 export type NewTodo = typeof todos.$inferInsert;
 
+export type SerializedTodo = Omit<Todo, 'createdAt' | 'updatedAt'> & {
+  createdAt: string;
+  updatedAt: string;
+};
+
+

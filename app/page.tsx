@@ -1,10 +1,11 @@
 import db from '@/lib/db';
-import { todos } from '@/lib/schema';
+import { todos, SerializedTodo } from '@/lib/schema';
 import { authServer } from '@/lib/auth/server';
 import { eq, desc } from 'drizzle-orm';
 import { TodoList } from '@/components/todos/todo-list';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 export default async function Home() {
   const result: any = await authServer.getSession();
@@ -37,8 +38,8 @@ export default async function Home() {
     .where(eq(todos.userId, session.user.id))
     .orderBy(desc(todos.createdAt));
 
-  // Serialize todos to ensure no Date objects are passed to Client Components
-  const userTodos = rawTodos.map(todo => ({
+  // Explicit serialization for Client Component hydration safety
+  const userTodos: SerializedTodo[] = rawTodos.map(todo => ({
     ...todo,
     createdAt: todo.createdAt.toISOString(),
     updatedAt: todo.updatedAt.toISOString(),
@@ -57,7 +58,7 @@ export default async function Home() {
           </Button>
         </header>
 
-        <TodoList initialTodos={userTodos as any} />
+        <TodoList initialTodos={userTodos} />
       </div>
     </div>
   );

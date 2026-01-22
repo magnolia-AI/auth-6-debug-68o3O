@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Todo } from '@/lib/schema';
+import { SerializedTodo } from '@/lib/schema';
 import { addTodo, toggleTodo, deleteTodo } from '@/app/todos/actions';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { Trash2, Plus, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface TodoListProps {
-  initialTodos: Todo[];
+  initialTodos: SerializedTodo[];
 }
 
 export function TodoList({ initialTodos }: TodoListProps) {
@@ -93,4 +93,6 @@ export function TodoList({ initialTodos }: TodoListProps) {
     </Card>
   );
 }
+
+
 
