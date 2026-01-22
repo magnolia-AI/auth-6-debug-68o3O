@@ -31,11 +31,18 @@ export default async function Home() {
     );
   }
 
-  const userTodos = await db
+  const rawTodos = await db
     .select()
     .from(todos)
     .where(eq(todos.userId, session.user.id))
     .orderBy(desc(todos.createdAt));
+
+  // Serialize todos to ensure no Date objects are passed to Client Components
+  const userTodos = rawTodos.map(todo => ({
+    ...todo,
+    createdAt: todo.createdAt.toISOString(),
+    updatedAt: todo.updatedAt.toISOString(),
+  }));
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pt-12">
@@ -50,7 +57,7 @@ export default async function Home() {
           </Button>
         </header>
 
-        <TodoList initialTodos={userTodos} />
+        <TodoList initialTodos={userTodos as any} />
       </div>
     </div>
   );
