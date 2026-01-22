@@ -1,11 +1,10 @@
 import db from '@/lib/db';
-import { todos, SerializedTodo } from '@/lib/schema';
+import { todos, users, SerializedTodo } from '@/lib/schema';
 import { authServer } from '@/lib/auth/server';
 import { eq, desc } from 'drizzle-orm';
 import { TodoList } from '@/components/todos/todo-list';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 
 export default async function Home() {
   const result: any = await authServer.getSession();
@@ -31,6 +30,23 @@ export default async function Home() {
       </div>
     );
   }
+
+  // Sync user to local database if they don't exist
+  // This prevents Foreign Key violations in todos table
+  await db.insert(users)
+    .values({
+      userId: session.user.id,
+      email: session.user.email,
+      name: session.user.name,
+    })
+    .onConflictDoUpdate({
+      target: users.userId,
+      set: {
+        email: session.user.email,
+        name: session.user.name,
+        updatedAt: new Date(),
+      }
+    });
 
   const rawTodos = await db
     .select()
